@@ -1,0 +1,49 @@
+﻿<h1>Home</h1>
+
+@*inizializzo la property Model Di RazorPage*@
+@model List<Pizza>
+
+    @if(Model.Count() == 0){
+        <h3>Non ci sono pizze</h3>
+    }else{
+        
+        <h2>Le mie pizze</h2>
+        <br/>
+        <table class="table align-middle mb-0 bg-white">
+            <thead class="bg-light">
+                <tr>
+                    <th>Foto</th>
+                    <th>Nome</th>
+                    <th>Descrizione</th>
+                    <th>Prezzo</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach(Pizza pizza in Model){
+                <tr>
+                    <td>
+                        <div class="d-flex flex-column align-items-center">
+                            <img src="@pizza.Image"
+                                 alt=""
+                                 style="width: 200px; height: 200px"
+                            >
+                            <a href="@Url.Action("Detail",new {id = pizza.Id})">Scopri di più</a>
+                        </div>
+                    </td>
+                    <td>
+                        <p class="fw-normal mb-1">@pizza.Name</p>
+                    </td>
+                    <td>
+                        <p class="fw-normal mb-1">@pizza.Description</p>
+                    </td>
+                    <td>
+                        <p class="fw-normal mb-1">@pizza.Price euro</p>
+                    </td>
+
+                </tr>
+            }
+            </tbody>
+        </table>
+        }
+
+

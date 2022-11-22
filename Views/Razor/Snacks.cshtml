@@ -1,0 +1,144 @@
+﻿@{
+    Layout = "_SecondLayout";
+}
+
+<a asp-area="" asp-controller="Home" asp-action="Index">Torna alla home</a>
+
+<br />
+
+<h1>Razor Snacks</h1>
+<hr/>
+<br />
+
+
+<h2>Snack 1</h2>
+<p>
+    Dichiarare una variabile valorizzandola con il nostro nome.
+    Dichiarare un'altra variabile valorizzandola con il nostro cognome.
+    Stampare il nostro nome e cognome all'interno di un tag h2.
+</p>
+
+@{
+    string nome = "Jacopo";
+     string cognome = "Sergio";
+}
+
+<h3>@nome @cognome</h3>
+<hr />
+
+<h2>Snack 2</h2>
+<p>
+    Creare una funzione che stampa la somma dei numeri che vanno da 1 a n (con n passato come parametro - n incluso)
+    Stampare dentro uno span il risultato.
+</p>
+
+
+@{
+        int StampaSomma(int numero){
+            int somma = 0;
+            for(int i = 0; i <= numero; i++){
+                somma += i;
+            }
+            return somma;
+      }
+}
+
+<span>@StampaSomma(10)</span>
+<hr />
+
+<h2>Snack 3</h2>
+<p>
+    Contare quante volte la lettera a è presente nalla frase "nel mezzo del cammin di nostra vita" e stampare questo valore in pagina
+</p>
+
+
+@{
+    int contaLetteraA(string frase)
+    {
+        int conteggio = 0;
+        char lettera = 'a';
+        foreach (char item in frase)
+        {
+            if (lettera == item)
+                conteggio++;
+        }
+        return conteggio;
+    }
+}
+
+<span>@contaLetteraA("nel mezzo del cammin di nostra vita")</span>
+<hr />
+
+<h2>Snack 4</h2>
+<p>
+    Creare una List<int> di 20 numeri interi (generati random da 1 a 90, 1 e 90 inclusi) e mostrare in pagina solo i numeri compresi tra 20 e 70
+</p>
+
+
+@{
+    List<int> listaNumeri = new List<int>();
+        for(int i = 0; i < 20; i++)
+        {
+            Random rnd = new Random();
+            int num = rnd.Next(1, 91);
+            listaNumeri.Add(num);
+        }
+
+    string listaDaStampare(List<int> Lista)
+    {
+        string output = "Tutti i numeri: \r\n";
+
+        foreach (int item in Lista)
+        {
+            if (item <= 70 && item >= 20){
+                output += @item + "\r\n"; ;
+            }
+                
+        }
+        return output;
+    }
+  }
+        
+<span>@listaDaStampare(listaNumeri)</span>
+<hr />
+
+<h2>Snack 5</h2>
+<p>
+    Stampare in pagina la data e l'ora attuale (usando la classe DateTime) con il formato anno-mese-giorno ore:minuti:secondi
+</p>
+
+
+@{
+    DateTime dataAttuale = DateTime.Now;
+}
+
+<h3>@dataAttuale.ToString("yyyy/MM/dd/ HH:mm:ss")</h3>
+<hr />
+
+<h2>Snack 6</h2>
+<p>
+    Partendo dalla data di oggi (usando la classe DateTime) stampare in pagina
+</p>
+<ul>
+    <li>
+        a. la data di 7 giorni fa
+    </li>
+    <li>
+       b. che giorno della settimana è oggi (il risultato dovrà essere il nome del giorno (Lunedì, Martedì, ...)
+    </li>
+    <li>
+        c. che giorno della settimana sarà nello stesso giorno e mese di oggi ma tra un anno (il risultato dovrà essere il nome del giorno (Lunedì, Martedì, ...)
+    </li>
+</ul>
+
+@{
+    DateTime dataPassata = dataAttuale.AddDays(-7);
+    DateTime dataTraAnno = dataAttuale.AddYears(1);
+}
+
+<h3>La data di oggi è: @dataAttuale.ToString("yyyy/MM/dd/ HH:mm:ss")</h3>
+<h3>a. La data di 7 giorni fa: @dataPassata.ToString()</h3>
+<h3>b. Oggi è il giorno: @dataPassata.DayOfWeek.ToString()</h3>
+<h3>b. Il giorno tra un anno sarà: @dataTraAnno.DayOfWeek.ToString()</h3>
+<hr />
+

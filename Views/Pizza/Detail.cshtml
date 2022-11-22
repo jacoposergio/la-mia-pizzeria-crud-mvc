@@ -1,0 +1,15 @@
+﻿@model Pizza
+
+<h3> Dettagli pizza @Model.Name</h3>
+
+<div class="card" style="width: 18rem;">
+    <img class="card-img-top" src="@Model.Image" alt="Card image cap">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text">Descrizione: @Model.Description</p>
+        <p class="card-title">Prezzo: @Model.Price euro</p>
+    </div>
+    <div class="card-body">
+        <a class="card-link" asp-area="" asp-controller="Pizza" asp-action="Index">Torna alla home</a>
+    </div>
+</div>
