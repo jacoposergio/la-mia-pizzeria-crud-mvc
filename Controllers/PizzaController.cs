@@ -1,6 +1,10 @@
 ﻿using la_mia_pizzeria_static.Data;
 using la_mia_pizzeria_static.Models;
+using la_mia_pizzeria_static.Models.Form;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace la_mia_pizzeria_static.Controllers
 {
@@ -30,17 +34,24 @@ namespace la_mia_pizzeria_static.Controllers
 
         public IActionResult Create()
         {
-          
-            return View();
+            PizzaForm formData = new PizzaForm();
+            formData.Pizza = new Pizza();
+            formData.Categories = db.Categories.ToList();
+
+            //formData a questo punto diventa il nuovo model
+            return View(formData);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Pizza pizza)
+        public IActionResult Create(PizzaForm formData)
         {
             if (!ModelState.IsValid)
             {
-                return View();
+                //PizzaForm formData = new PostForm();
+                //formData.Pizza = pizza;
+                formData.Categories = db.Categories.ToList();
+                return View(formData);  //devo riadattare il model per passarlo
             }
 
             db.Pizze.Add(pizza);

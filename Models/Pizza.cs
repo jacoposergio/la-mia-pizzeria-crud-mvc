@@ -27,8 +27,10 @@ namespace la_mia_pizzeria_static.Models
         public string Image { get; set; }
 
         //relazione 1 a * con Category
+        //chiave esterna
         public int CategoryId{ get; set; }
-        public Category Category { get; set; }
+        //istanza del record nelle query, serve solo all'orm non al db
+        public Category? Category { get; set; }
 
         public Pizza()
         {
