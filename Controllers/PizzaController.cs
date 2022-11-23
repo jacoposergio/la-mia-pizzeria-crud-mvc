@@ -1,6 +1,7 @@
 ﻿using la_mia_pizzeria_static.Data;
 using la_mia_pizzeria_static.Models;
 using la_mia_pizzeria_static.Models.Form;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ namespace la_mia_pizzeria_static.Controllers
         public IActionResult Index()
         {
 
-            List<Pizza> listaPizza = db.Pizze.ToList();
+            List<Pizza> listaPizza = db.Pizze.Include(pizza => pizza.Category).ToList();
 
             return View(listaPizza);
         }
@@ -46,6 +47,7 @@ namespace la_mia_pizzeria_static.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(PizzaForm formData)
         {
+            
             if (!ModelState.IsValid)
             {
                 //PizzaForm formData = new PostForm();
@@ -54,7 +56,7 @@ namespace la_mia_pizzeria_static.Controllers
                 return View(formData);  //devo riadattare il model per passarlo
             }
 
-            db.Pizze.Add(pizza);
+            db.Pizze.Add(formData.Pizza);
             db.SaveChanges();
 
             return RedirectToAction("Index");
@@ -62,11 +64,22 @@ namespace la_mia_pizzeria_static.Controllers
 
         public IActionResult Update(int Id)
         {
+            formData.Pizza.Id = Id;
+            //PizzaForm formData = new PizzaForm();
+            //formData.Pizza = new Pizza();
             Pizza pizza = db.Pizze.Where(pizza => pizza.Id == Id).FirstOrDefault();
 
             if (pizza == null)
                 return NotFound();
-            return View(pizza);
+
+            PizzaForm formData = new PizzaForm();
+
+            formData.Pizza = pizza;
+            formData.Categories = db.Categories.ToList();
+
+           
+
+            return View(formData);
         }
 
         [HttpPost]
