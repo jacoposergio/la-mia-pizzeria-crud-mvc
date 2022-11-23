@@ -26,6 +26,10 @@ namespace la_mia_pizzeria_static.Models
         [Required(ErrorMessage = "Devi inserire un Url di un'immagine")]
         public string Image { get; set; }
 
+        //relazione 1 a * con Category
+        public int CategoryId{ get; set; }
+        public Category Category { get; set; }
+
         public Pizza()
         {
 
