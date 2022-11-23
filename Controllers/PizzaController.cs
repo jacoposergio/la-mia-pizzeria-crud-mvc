@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace la_mia_pizzeria_static.Controllers
@@ -62,35 +63,89 @@ namespace la_mia_pizzeria_static.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult Update(int Id)
-        {
-            formData.Pizza.Id = Id;
-            //PizzaForm formData = new PizzaForm();
-            //formData.Pizza = new Pizza();
-            Pizza pizza = db.Pizze.Where(pizza => pizza.Id == Id).FirstOrDefault();
+        //public IActionResult Update(int Id)
+        //{
+        //    formData.Pizza.Id = Id;
+        //    //PizzaForm formData = new PizzaForm();
+        //    //formData.Pizza = new Pizza();
+        //    Pizza pizza = db.Pizze.Where(pizza => pizza.Id == Id).FirstOrDefault();
 
-            if (pizza == null)
+        //    if (pizza == null)
+        //        return NotFound();
+
+        //    PizzaForm formData = new PizzaForm();
+
+        //    formData.Pizza = pizza;
+        //    formData.Categories = db.Categories.ToList();
+
+
+
+        //    return View(formData);
+        //}
+
+        //[HttpPost]
+        //public IActionResult Update(Pizza pizza)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View();
+        //    }
+
+        //    db.Pizze.Update(pizza);
+        //    db.SaveChanges();
+
+        //    return RedirectToAction("Index");
+        //}
+
+        public IActionResult Update(int id)
+        {
+
+            Pizza post = db.Pizze.Where(post => post.Id == id).FirstOrDefault();
+
+            if (post == null)
                 return NotFound();
 
             PizzaForm formData = new PizzaForm();
 
-            formData.Pizza = pizza;
+            formData.Pizza = post;
             formData.Categories = db.Categories.ToList();
 
-           
-
+            //return View() --> non funziona perchè non ha la memoria della postItem
             return View(formData);
         }
 
+        //[HttpPost]
+        //public IActionResult Update(Post postItem)
+        //{
+
+        //    if (!ModelState.IsValid)
+        //    {
+        //        //return View(postItem);
+        //        return View();
+        //    }
+
+        //    db.Posts.Update(postItem);
+        //    db.SaveChanges();
+
+        //    return RedirectToAction("Index");
+        //}
+
+        //altro modo
         [HttpPost]
-        public IActionResult Update(Pizza pizza)
+        [ValidateAntiForgeryToken]
+        public IActionResult Update(int id, PizzaForm formData)
         {
+
+            formData.Pizza.Id = id;
+
             if (!ModelState.IsValid)
             {
-                return View();
+                //return View(postItem);
+                formData.Categories = db.Categories.ToList();
+                return View(formData);
             }
 
-            db.Pizze.Update(pizza);
+            db.Pizze.Update(formData.Pizza);
             db.SaveChanges();
 
             return RedirectToAction("Index");
