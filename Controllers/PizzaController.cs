@@ -48,13 +48,15 @@ namespace la_mia_pizzeria_static.Controllers
 
             formData.Pizza = new Pizza();
             formData.Categories = db.Categories.ToList();
-            formData.Ingredients = new List<SelectListItem>();
+            formData.Ingredients = new List<SelectListItem>();  //ora gli ingredient sono una lista di SelectListItem
 
+            //per popolarlo prendiamo una lista di ingredient e col forech la convertiamo
             List<Ingredient> ingredientList = db.Ingredients.ToList();
 
             foreach (Ingredient ingredient in ingredientList)
             {
-                formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));
+                formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));  //passiamo alla SelectListItemi i dati (le chiavi valore delle option)
+                //Dato che convertiamo l'int in string avremo problemi sull altro oggetto
             }
 
             //formData a questo punto diventa il nuovo model
@@ -68,14 +70,13 @@ namespace la_mia_pizzeria_static.Controllers
             
             if (!ModelState.IsValid)
             {
-                //PizzaForm formData = new PostForm();
-                //formData.Pizza = pizza;
+                
                 formData.Categories = db.Categories.ToList();
                 formData.Ingredients = new List<SelectListItem>();
 
-                List<Ingredient> tagList = db.Ingredients.ToList();
+                List<Ingredient> IngredientList = db.Ingredients.ToList();
 
-                foreach (Ingredient ingredient in tagList)
+                foreach (Ingredient ingredient in IngredientList)
                 {
                     formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));
                 }
@@ -89,9 +90,9 @@ namespace la_mia_pizzeria_static.Controllers
             if (formData.SelectedIngredients != null)
             {
 
-                foreach (int ingID in formData.SelectedIngredients)
+                foreach (int ingredientId in formData.SelectedIngredients)
                 {
-                    Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingID).FirstOrDefault();
+                    Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingredientId).FirstOrDefault();
                     formData.Pizza.Ingredients.Add(ingredient);
                 }
             }
@@ -105,7 +106,7 @@ namespace la_mia_pizzeria_static.Controllers
 
         public IActionResult Update(int id)
         {
-
+            //Non avendo la ingredientId(relazione * a *), dobbiamo recuperare selectedTags e Model.Tag che passiamo alla view
             Pizza pizza = db.Pizze.Where(pizza => pizza.Id == id).Include("Ingredients").FirstOrDefault();
 
             if (pizza == null)
@@ -117,19 +118,19 @@ namespace la_mia_pizzeria_static.Controllers
             formData.Categories = db.Categories.ToList();
             formData.Ingredients = new List<SelectListItem>();
 
-            List<Ingredient> ingredientsList = db.Ingredients.ToList();
+            List<Ingredient> ingredientsList = db.Ingredients.ToList();  //creiamo una lista che contiene tutti i tag
+            //nel foreach creiamo l'oggetto che contiene i nostri dati e  tutti gli ingredienti già selezionati  
+            //(non abbiamo l'hold, quindi questo è un escamotage per recuperare gli ingredienti  già salvati
 
             foreach (Ingredient ingredient in ingredientsList)
             {
                 formData.Ingredients.Add(new SelectListItem(
                     ingredient.Title,
                     ingredient.Id.ToString(),
-                    pizza.Ingredients.Any(i => i.Id == ingredient.Id)
+                    pizza.Ingredients.Any(i => i.Id == ingredient.Id)  //se l'id è true significa che esiste nella pivot e quindi passa all'asp item che lo stampa
                    ));
             }
-
-
-            return View(formData);
+            return View(formData); 
         }
 
         //altro modo
@@ -156,22 +157,25 @@ namespace la_mia_pizzeria_static.Controllers
                 return View(formData);
             }
 
-            //update esplicito con nuovo oggetto
+            //update esplicito con nuovo oggetto: recuperiamo la pizza dal db
             Pizza pizzaItem = db.Pizze.Where(pizza => pizza.Id == id).Include("Ingredients").FirstOrDefault();
+            //ora tutti gli elementi sono tracked, cioè stiamo lavorando sul db
 
             if (pizzaItem == null)
             {
                 return NotFound();
             }
 
-
+            //aggiorniamo tutti i dati
             pizzaItem.Name = formData.Pizza.Name;
             pizzaItem.Description = formData.Pizza.Description;
             pizzaItem.Image = formData.Pizza.Image;
             pizzaItem.Price = formData.Pizza.Price;
             pizzaItem.CategoryId = formData.Pizza.CategoryId;
 
-            pizzaItem.Ingredients.Clear();
+            pizzaItem.Ingredients.Clear(); //cancelliamo le relazioni che già esistevano
+
+            //Update implicito
 
             if (formData.SelectedIngredients == null)
             {
@@ -181,7 +185,8 @@ namespace la_mia_pizzeria_static.Controllers
             foreach (int ingredientId in formData.SelectedIngredients)
             {
                 Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingredientId).FirstOrDefault();
-                pizzaItem.Ingredients.Add(ingredient);
+                pizzaItem.Ingredients.Add(ingredient);   //adesso possiamo riassegnarli facendo una query, quando fa l'add sa che  è un update e non new tag
+                // non viene creato nuovo, ma assegnato alla pivot
             }
 
             //db.Posts.Update(formData.Post);
@@ -207,11 +212,3 @@ namespace la_mia_pizzeria_static.Controllers
         }
     }
 }
-
-
-
-//1 
-//    2
-//    2
-//    3
-//    4

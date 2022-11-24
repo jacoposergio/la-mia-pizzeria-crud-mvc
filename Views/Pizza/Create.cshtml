@@ -48,15 +48,15 @@
                 </div>
                 <div class="mb-3">
                     <strong>Ingredienti:</strong>
-                    <select asp-for="SelectedIngredients"
-                            asp-items="@Model.Ingredients"
+                  @*  lavora sulla tabella ponte, ha la lista di ciò selezionato dall'utente
+                    ma selectedIngredients non esiste nel modello *@
+                    @* asp-items vuole una selected list item, cioè una lista di ingredienti, che creiamo nel model  *@
+                    <select asp-for="SelectedIngredients"   
+                            asp-items="@Model.Ingredients" 
                             multiple="multiple"
                             size="10"
                             class="form-control mb-2 mr-sm-2 ml-sm-3 leftList">
                     </select>
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Salva Pizza</button>
                 </div>
                 <div class="text-end">
                     <input type="submit" class="btn btn-small btn-success" value="Salva">
