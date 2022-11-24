@@ -11,6 +11,6 @@
         public List<Ingredient>? Ingredients { get; set; }
 
         //create
-        public List<int> SelectedIngredients { get; set; }
+        public List<int>? SelectedIngredients { get; set; }
     }
 }

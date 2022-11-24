@@ -37,6 +37,7 @@ namespace la_mia_pizzeria_static.Controllers
         public IActionResult Create()
         {
             PizzaForm formData = new PizzaForm();
+
             formData.Pizza = new Pizza();
             formData.Categories = db.Categories.ToList();
             formData.Ingredients = db.Ingredients.ToList();
@@ -60,10 +61,11 @@ namespace la_mia_pizzeria_static.Controllers
 
             //associazione degli ingredienti scelti nella create al modello
             formData.Pizza.Ingredients = new List<Ingredient>(); //è opzionale e null, lo inizializzo fuori al foreach
-            foreach(int IngredientId in formData.SelectedIngredients)
+            foreach(int ingredientId in formData.SelectedIngredients)
             {
-                Ingredient ingredient = db.Ingredients.Where(i => i.Id == IngredientId).FirstOrDefault();
-                return View(formData);
+                Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingredientId).FirstOrDefault();
+                formData.Pizza.Ingredients.Add(ingredient);
+                //return View(formData);
             }
 
             db.Pizze.Add(formData.Pizza);
