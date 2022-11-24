@@ -8,6 +8,13 @@
         <h5 class="card-title">@Model.Name</h5>
         <p class="card-text">Descrizione: @Model.Description</p>
         <p class="card-title">Prezzo: @Model.Price euro</p>
+        <p class="card-title">Categoria: @Model.Category.Title euro</p>
+        <p class="card-title">Ingredienti:
+            @foreach(Ingredient ingredient in Model.Ingredients)
+            {
+                <span class="badge bg-primary">@ingredient.Title</span>
+            }
+        </p>
     </div>
     <div class="card-body">
         <a class="card-link" asp-area="" asp-controller="Pizza" asp-action="Index">Torna alla home</a>
