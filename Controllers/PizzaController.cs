@@ -110,7 +110,6 @@ namespace la_mia_pizzeria_static.Controllers
             formData.Pizza = post;
             formData.Categories = db.Categories.ToList();
 
-            //return View() --> non funziona perchè non ha la memoria della postItem
             return View(formData);
         }
 

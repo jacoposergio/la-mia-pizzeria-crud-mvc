@@ -32,6 +32,9 @@ namespace la_mia_pizzeria_static.Models
         //istanza del record nelle query, serve solo all'orm non al db
         public Category? Category { get; set; }
 
+        //relazioni molti a molti Ingrediente - Pizza
+        public List<Ingredient>? Ingredients { get; set; }
+
         public Pizza()
         {
 
