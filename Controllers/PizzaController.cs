@@ -39,6 +39,7 @@ namespace la_mia_pizzeria_static.Controllers
             PizzaForm formData = new PizzaForm();
             formData.Pizza = new Pizza();
             formData.Categories = db.Categories.ToList();
+            formData.Ingredients = db.Ingredients.ToList();
 
             //formData a questo punto diventa il nuovo model
             return View(formData);
@@ -57,45 +58,19 @@ namespace la_mia_pizzeria_static.Controllers
                 return View(formData);  //devo riadattare il model per passarlo
             }
 
+            //associazione degli ingredienti scelti nella create al modello
+            formData.Pizza.Ingredients = new List<Ingredient>(); //è opzionale e null, lo inizializzo fuori al foreach
+            foreach(int IngredientId in formData.SelectedIngredients)
+            {
+                Ingredient ingredient = db.Ingredients.Where(i => i.Id == IngredientId).FirstOrDefault();
+                return View(formData);
+            }
+
             db.Pizze.Add(formData.Pizza);
             db.SaveChanges();
 
             return RedirectToAction("Index");
         }
-
-        //public IActionResult Update(int Id)
-        //{
-        //    formData.Pizza.Id = Id;
-        //    //PizzaForm formData = new PizzaForm();
-        //    //formData.Pizza = new Pizza();
-        //    Pizza pizza = db.Pizze.Where(pizza => pizza.Id == Id).FirstOrDefault();
-
-        //    if (pizza == null)
-        //        return NotFound();
-
-        //    PizzaForm formData = new PizzaForm();
-
-        //    formData.Pizza = pizza;
-        //    formData.Categories = db.Categories.ToList();
-
-
-
-        //    return View(formData);
-        //}
-
-        //[HttpPost]
-        //public IActionResult Update(Pizza pizza)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return View();
-        //    }
-
-        //    db.Pizze.Update(pizza);
-        //    db.SaveChanges();
-
-        //    return RedirectToAction("Index");
-        //}
 
         public IActionResult Update(int id)
         {
@@ -112,22 +87,6 @@ namespace la_mia_pizzeria_static.Controllers
 
             return View(formData);
         }
-
-        //[HttpPost]
-        //public IActionResult Update(Post postItem)
-        //{
-
-        //    if (!ModelState.IsValid)
-        //    {
-        //        //return View(postItem);
-        //        return View();
-        //    }
-
-        //    db.Posts.Update(postItem);
-        //    db.SaveChanges();
-
-        //    return RedirectToAction("Index");
-        //}
 
         //altro modo
         [HttpPost]

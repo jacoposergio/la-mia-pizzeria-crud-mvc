@@ -8,5 +8,9 @@
         //questa classe è a contorno, ci serve per fare cose nella views
         //è opzionale perchè in fase di validazione mi devo occupare solo del db
         public List<Category>? Categories { get; set; }
+        public List<Ingredient>? Ingredients { get; set; }
+
+        //create
+        public List<int> SelectedIngredients { get; set; }
     }
 }
