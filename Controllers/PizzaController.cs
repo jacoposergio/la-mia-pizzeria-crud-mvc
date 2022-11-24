@@ -1,12 +1,15 @@
-﻿using la_mia_pizzeria_static.Data;
+﻿using Azure;
+using la_mia_pizzeria_static.Data;
 using la_mia_pizzeria_static.Models;
 using la_mia_pizzeria_static.Models.Form;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Diagnostics;
 
 namespace la_mia_pizzeria_static.Controllers
 {
@@ -45,7 +48,14 @@ namespace la_mia_pizzeria_static.Controllers
 
             formData.Pizza = new Pizza();
             formData.Categories = db.Categories.ToList();
-            formData.Ingredients = db.Ingredients.ToList();
+            formData.Ingredients = new List<SelectListItem>();
+
+            List<Ingredient> ingredientList = db.Ingredients.ToList();
+
+            foreach (Ingredient ingredient in ingredientList)
+            {
+                formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));
+            }
 
             //formData a questo punto diventa il nuovo model
             return View(formData);
@@ -61,17 +71,31 @@ namespace la_mia_pizzeria_static.Controllers
                 //PizzaForm formData = new PostForm();
                 //formData.Pizza = pizza;
                 formData.Categories = db.Categories.ToList();
+                formData.Ingredients = new List<SelectListItem>();
+
+                List<Ingredient> tagList = db.Ingredients.ToList();
+
+                foreach (Ingredient ingredient in tagList)
+                {
+                    formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));
+                }
+
                 return View(formData);  //devo riadattare il model per passarlo
             }
 
             //associazione degli ingredienti scelti nella create al modello
             formData.Pizza.Ingredients = new List<Ingredient>(); //è opzionale e null, lo inizializzo fuori al foreach
-            foreach(int ingredientId in formData.SelectedIngredients)
+
+            if (formData.SelectedIngredients != null)
             {
-                Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingredientId).FirstOrDefault();
-                formData.Pizza.Ingredients.Add(ingredient);
-                //return View(formData);
+
+                foreach (int ingID in formData.SelectedIngredients)
+                {
+                    Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingID).FirstOrDefault();
+                    formData.Pizza.Ingredients.Add(ingredient);
+                }
             }
+
 
             db.Pizze.Add(formData.Pizza);
             db.SaveChanges();
@@ -82,15 +106,28 @@ namespace la_mia_pizzeria_static.Controllers
         public IActionResult Update(int id)
         {
 
-            Pizza post = db.Pizze.Where(post => post.Id == id).FirstOrDefault();
+            Pizza pizza = db.Pizze.Where(pizza => pizza.Id == id).Include("Ingredients").FirstOrDefault();
 
-            if (post == null)
+            if (pizza == null)
                 return NotFound();
 
             PizzaForm formData = new PizzaForm();
 
-            formData.Pizza = post;
+            formData.Pizza = pizza;
             formData.Categories = db.Categories.ToList();
+            formData.Ingredients = new List<SelectListItem>();
+
+            List<Ingredient> ingredientsList = db.Ingredients.ToList();
+
+            foreach (Ingredient ingredient in ingredientsList)
+            {
+                formData.Ingredients.Add(new SelectListItem(
+                    ingredient.Title,
+                    ingredient.Id.ToString(),
+                    pizza.Ingredients.Any(i => i.Id == ingredient.Id)
+                   ));
+            }
+
 
             return View(formData);
         }
@@ -99,18 +136,55 @@ namespace la_mia_pizzeria_static.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Update(int id, PizzaForm formData)
-        {
-
-            formData.Pizza.Id = id;
+        {          
 
             if (!ModelState.IsValid)
             {
-                //return View(postItem);
+                formData.Pizza.Id = id;
+                //return View(pizzaItem);
                 formData.Categories = db.Categories.ToList();
+                formData.Ingredients = new List<SelectListItem>();
+
+                List<Ingredient> ingredientsList = db.Ingredients.ToList();
+
+                foreach (Ingredient ingredient in ingredientsList)
+                {
+                    formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));
+                }
+
+
                 return View(formData);
             }
 
-            db.Pizze.Update(formData.Pizza);
+            //update esplicito con nuovo oggetto
+            Pizza pizzaItem = db.Pizze.Where(pizza => pizza.Id == id).Include("Ingredients").FirstOrDefault();
+
+            if (pizzaItem == null)
+            {
+                return NotFound();
+            }
+
+
+            pizzaItem.Name = formData.Pizza.Name;
+            pizzaItem.Description = formData.Pizza.Description;
+            pizzaItem.Image = formData.Pizza.Image;
+            pizzaItem.Price = formData.Pizza.Price;
+            pizzaItem.CategoryId = formData.Pizza.CategoryId;
+
+            pizzaItem.Ingredients.Clear();
+
+            if (formData.SelectedIngredients == null)
+            {
+                formData.SelectedIngredients = new List<int>();
+            }
+
+            foreach (int ingredientId in formData.SelectedIngredients)
+            {
+                Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingredientId).FirstOrDefault();
+                pizzaItem.Ingredients.Add(ingredient);
+            }
+
+            //db.Posts.Update(formData.Post);
             db.SaveChanges();
 
             return RedirectToAction("Index");
@@ -133,3 +207,11 @@ namespace la_mia_pizzeria_static.Controllers
         }
     }
 }
+
+
+
+//1 
+//    2
+//    2
+//    3
+//    4

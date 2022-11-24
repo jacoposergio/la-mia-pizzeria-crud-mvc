@@ -1,4 +1,6 @@
-﻿namespace la_mia_pizzeria_static.Models.Form
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace la_mia_pizzeria_static.Models.Form
 {
     public class PizzaForm
     {
@@ -9,7 +11,7 @@
         //è opzionale perchè in fase di validazione mi devo occupare solo del db
         public List<Category>? Categories { get; set; }
         public List<Ingredient>? Ingredients { get; set; }
-
+        public List<SelectListItem>? Ingredients { get; set; }
         //create
         public List<int>? SelectedIngredients { get; set; }
     }
