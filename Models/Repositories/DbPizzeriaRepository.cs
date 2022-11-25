@@ -6,7 +6,7 @@ using Microsoft.SqlServer.Server;
 
 namespace la_mia_pizzeria_static.Models.Repositories
 {
-    public class DbPizzeriaRepository
+    public class DbPizzeriaRepository : IPizzeriaRepository
     {
         private PizzeriaDbContext db;
 
@@ -24,29 +24,29 @@ namespace la_mia_pizzeria_static.Models.Repositories
 
         public Pizza GetById(int id)
         {
-           return db.Pizze.Where(p => p.Id == id).Include("Category").Include("Ingredients").FirstOrDefault();
+            return db.Pizze.Where(p => p.Id == id).Include("Category").Include("Ingredients").FirstOrDefault();
         }
 
-        public PizzaForm CreatePizzaForm()
-        {
-            PizzaForm formData = new PizzaForm();
+        //public PizzaForm CreatePizzaForm()
+        //{
+        //    PizzaForm formData = new PizzaForm();
 
-            formData.Pizza = new Pizza();
-            formData.Categories = db.Categories.ToList();
-            formData.Ingredients = new List<SelectListItem>();  //ora gli ingredient sono una lista di SelectListItem
+        //    formData.Pizza = new Pizza();
+        //    formData.Categories = db.Categories.ToList();
+        //    formData.Ingredients = new List<SelectListItem>();  //ora gli ingredient sono una lista di SelectListItem
 
-            //per popolarlo prendiamo una lista di ingredient e col forech la convertiamo
-            List<Ingredient> ingredientList = db.Ingredients.ToList();
+        //    //per popolarlo prendiamo una lista di ingredient e col forech la convertiamo
+        //    List<Ingredient> ingredientList = db.Ingredients.ToList();
 
-            foreach (Ingredient ingredient in ingredientList)
-            {
-                formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));  //passiamo alla SelectListItemi i dati (le chiavi valore delle option)
-                //Dato che convertiamo l'int in string avremo problemi sull altro oggetto
-            }
+        //    foreach (Ingredient ingredient in ingredientList)
+        //    {
+        //        formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));  //passiamo alla SelectListItemi i dati (le chiavi valore delle option)
+        //        //Dato che convertiamo l'int in string avremo problemi sull altro oggetto
+        //    }
 
-            //formData a questo punto diventa il nuovo model
-            return formData;
-        }
+        //    //formData a questo punto diventa il nuovo model
+        //    return formData;
+        //}
 
         public void Create(Pizza pizza, List<int> SelectedIngredients)
         {
@@ -66,7 +66,7 @@ namespace la_mia_pizzeria_static.Models.Repositories
 
         public void Update(Pizza pizza, Pizza formData, List<int>? SelectedIngredients)
         {
-          
+
             //Update implicito
 
             if (SelectedIngredients == null)
@@ -83,20 +83,22 @@ namespace la_mia_pizzeria_static.Models.Repositories
 
             pizza.Ingredients.Clear(); //cancelliamo le relazioni che già esistevano
 
-     
+
 
             foreach (int ingredientId in SelectedIngredients)
             {
                 Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingredientId).FirstOrDefault();
                 pizza.Ingredients.Add(ingredient);   //adesso possiamo riassegnarli facendo una query, quando fa l'add sa che  è un update e non new tag
-                // non viene creato nuovo, ma assegnato alla pivot
+                                                     // non viene creato nuovo, ma assegnato alla pivot
+                pizza.Ingredients.Any(i => i.Id == ingredient.Id);  //se l'id è true significa che esiste nella pivot e quindi passa all'asp item che lo stampa
             }
 
             //db.Posts.Update(formData.Post);
             db.SaveChanges();
         }
 
-        internal void Delete(Pizza pizza)
+
+        public void Delete(Pizza pizza)
         {
             //puo essere che debbano esserci dei controlli,
             //che ho lasciato nel delete del controller

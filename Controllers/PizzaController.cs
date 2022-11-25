@@ -20,12 +20,22 @@ namespace la_mia_pizzeria_static.Controllers
         PizzeriaDbContext db;
 
         //Uso il repository al posto del db
-        DbPizzeriaRepository pizzaRepository;
-        public PizzaController() : base()
+        //DbPizzeriaRepository pizzaRepository;
+        //public PizzaController() : base()
+        //{
+        //    db = new PizzeriaDbContext();
+
+        //    pizzaRepository = new DbPizzeriaRepository();
+        //}
+
+        IPizzeriaRepository pizzaRepository;   // 2 classi che non hanno vincolo di ereditarietà che implementano entrambi l'interfaccia
+        // con la stessa aria di memoria posso avere 2 comportamenti diversi, uno sulla lista , uno sul db
+        public PizzaController(IPizzeriaRepository _pizzeriaRepository) : base() 
         {
             db = new PizzeriaDbContext();
 
-            pizzaRepository = new DbPizzeriaRepository();
+            pizzaRepository = _pizzeriaRepository;
+            pizzaRepository = new ListPizzeriaRepository();
         }
 
         public IActionResult Index()
@@ -50,7 +60,23 @@ namespace la_mia_pizzeria_static.Controllers
 
         public IActionResult Create()
         {
-            return View(pizzaRepository.CreatePizzaForm());
+            PizzaForm formData = new PizzaForm();
+
+            formData.Pizza = new Pizza();
+            formData.Categories = db.Categories.ToList();
+            formData.Ingredients = new List<SelectListItem>();  //ora gli ingredient sono una lista di SelectListItem
+
+            //per popolarlo prendiamo una lista di ingredient e col forech la convertiamo
+            List<Ingredient> ingredientList = db.Ingredients.ToList();
+
+            foreach (Ingredient ingredient in ingredientList)
+            {
+                formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));  //passiamo alla SelectListItemi i dati (le chiavi valore delle option)
+                //Dato che convertiamo l'int in string avremo problemi sull altro oggetto
+            }
+
+            //formData a questo punto diventa il nuovo model
+            return View(formData);
         }
 
         [HttpPost]
@@ -60,7 +86,8 @@ namespace la_mia_pizzeria_static.Controllers
             
             if (!ModelState.IsValid)
             {
-                
+                //return View(pizzaRepository.CreatePizzaForm());
+
                 formData.Categories = db.Categories.ToList();
                 formData.Ingredients = new List<SelectListItem>();
 
