@@ -50,23 +50,7 @@ namespace la_mia_pizzeria_static.Controllers
 
         public IActionResult Create()
         {
-            PizzaForm formData = new PizzaForm();
-
-            formData.Pizza = new Pizza();
-            formData.Categories = db.Categories.ToList();
-            formData.Ingredients = new List<SelectListItem>();  //ora gli ingredient sono una lista di SelectListItem
-
-            //per popolarlo prendiamo una lista di ingredient e col forech la convertiamo
-            List<Ingredient> ingredientList = db.Ingredients.ToList();
-
-            foreach (Ingredient ingredient in ingredientList)
-            {
-                formData.Ingredients.Add(new SelectListItem(ingredient.Title, ingredient.Id.ToString()));  //passiamo alla SelectListItemi i dati (le chiavi valore delle option)
-                //Dato che convertiamo l'int in string avremo problemi sull altro oggetto
-            }
-
-            //formData a questo punto diventa il nuovo model
-            return View(formData);
+            return View(pizzaRepository.CreatePizzaForm());
         }
 
         [HttpPost]
@@ -90,22 +74,8 @@ namespace la_mia_pizzeria_static.Controllers
                 return View(formData);  //devo riadattare il model per passarlo
             }
 
-            //associazione degli ingredienti scelti nella create al modello
-            formData.Pizza.Ingredients = new List<Ingredient>(); //è opzionale e null, lo inizializzo fuori al foreach
+            pizzaRepository.Create(formData.Pizza, formData.SelectedIngredients);
 
-            if (formData.SelectedIngredients != null)
-            {
-
-                foreach (int ingredientId in formData.SelectedIngredients)
-                {
-                    Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingredientId).FirstOrDefault();
-                    formData.Pizza.Ingredients.Add(ingredient);
-                }
-            }
-
-
-            db.Pizze.Add(formData.Pizza);
-            db.SaveChanges();
 
             return RedirectToAction("Index");
         }
@@ -136,6 +106,7 @@ namespace la_mia_pizzeria_static.Controllers
                     pizza.Ingredients.Any(i => i.Id == ingredient.Id)  //se l'id è true significa che esiste nella pivot e quindi passa all'asp item che lo stampa
                    ));
             }
+
             return View(formData); 
         }
 
@@ -165,54 +136,34 @@ namespace la_mia_pizzeria_static.Controllers
 
             //update esplicito con nuovo oggetto: recuperiamo la pizza dal db
             Pizza pizzaItem = pizzaRepository.GetById(id);
-            //ora tutti gli elementi sono tracked, cioè stiamo lavorando sul db
 
             if (pizzaItem == null)
             {
                 return NotFound();
             }
 
-            //aggiorniamo tutti i dati
-            pizzaItem.Name = formData.Pizza.Name;
-            pizzaItem.Description = formData.Pizza.Description;
-            pizzaItem.Image = formData.Pizza.Image;
-            pizzaItem.Price = formData.Pizza.Price;
-            pizzaItem.CategoryId = formData.Pizza.CategoryId;
+            //ora tutti gli elementi sono tracked, cioè stiamo lavorando sul db
+            pizzaRepository.Update(pizzaItem, formData.Pizza, formData.SelectedIngredients);
 
-            pizzaItem.Ingredients.Clear(); //cancelliamo le relazioni che già esistevano
-
-            //Update implicito
-
-            if (formData.SelectedIngredients == null)
-            {
-                formData.SelectedIngredients = new List<int>();
-            }
-
-            foreach (int ingredientId in formData.SelectedIngredients)
-            {
-                Ingredient ingredient = db.Ingredients.Where(i => i.Id == ingredientId).FirstOrDefault();
-                pizzaItem.Ingredients.Add(ingredient);   //adesso possiamo riassegnarli facendo una query, quando fa l'add sa che  è un update e non new tag
-                // non viene creato nuovo, ma assegnato alla pivot
-            }
-
-            //db.Posts.Update(formData.Post);
-            db.SaveChanges();
+           
 
             return RedirectToAction("Index");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int Id)
+        public IActionResult Delete(int id)
         {
-            Pizza pizza = db.Pizze.Where(pizza => pizza.Id == Id).FirstOrDefault();
+            Pizza pizza = pizzaRepository.GetById(id);
 
             if (pizza == null)
             {
                 return NotFound();
             }
-            db.Pizze.Remove(pizza);
-            db.SaveChanges();
+            //db.Pizze.Remove(pizza);
+            //db.SaveChanges();
+
+            pizzaRepository.Delete(pizza);
 
             return RedirectToAction("Index");
         }
