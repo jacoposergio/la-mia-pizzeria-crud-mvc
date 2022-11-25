@@ -2,6 +2,7 @@
 using la_mia_pizzeria_static.Data;
 using la_mia_pizzeria_static.Models;
 using la_mia_pizzeria_static.Models.Form;
+using la_mia_pizzeria_static.Models.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,15 +18,20 @@ namespace la_mia_pizzeria_static.Controllers
     {
 
         PizzeriaDbContext db;
+
+        //Uso il repository al posto del db
+        DbPizzeriaRepository pizzaRepository;
         public PizzaController() : base()
         {
             db = new PizzeriaDbContext();
+
+            pizzaRepository = new DbPizzeriaRepository();
         }
 
         public IActionResult Index()
         {
 
-            List<Pizza> listaPizza = db.Pizze.Include(pizza => pizza.Category).ToList();
+            List<Pizza> listaPizza = pizzaRepository.All();
 
             return View(listaPizza);
         }
@@ -33,7 +39,7 @@ namespace la_mia_pizzeria_static.Controllers
         public IActionResult Detail(int id)
         {
 
-            Pizza pizza = db.Pizze.Where(p => p.Id == id).Include("Category").Include("Ingredients").FirstOrDefault();
+            Pizza pizza = pizzaRepository.GetById(id);
 
             if(pizza == null)
             {
@@ -107,7 +113,7 @@ namespace la_mia_pizzeria_static.Controllers
         public IActionResult Update(int id)
         {
             //Non avendo la ingredientId(relazione * a *), dobbiamo recuperare selectedTags e Model.Tag che passiamo alla view
-            Pizza pizza = db.Pizze.Where(pizza => pizza.Id == id).Include("Ingredients").FirstOrDefault();
+            Pizza pizza = pizzaRepository.GetById(id);
 
             if (pizza == null)
                 return NotFound();
@@ -158,7 +164,7 @@ namespace la_mia_pizzeria_static.Controllers
             }
 
             //update esplicito con nuovo oggetto: recuperiamo la pizza dal db
-            Pizza pizzaItem = db.Pizze.Where(pizza => pizza.Id == id).Include("Ingredients").FirstOrDefault();
+            Pizza pizzaItem = pizzaRepository.GetById(id);
             //ora tutti gli elementi sono tracked, cioè stiamo lavorando sul db
 
             if (pizzaItem == null)
