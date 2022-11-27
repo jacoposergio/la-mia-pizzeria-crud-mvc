@@ -28,15 +28,15 @@ namespace la_mia_pizzeria_static.Models.Repositories
             return db.Pizze.Where(p => p.Id == id).Include("Category").Include("Ingredients").FirstOrDefault();
         }
 
-        public List<Category> GetCategories()
-        {
-            return db.Categories.Include("Pizze").ToList();
-        }
+        //public List<Category> GetCategories()
+        //{
+        //    return db.Categories.Include("Pizze").ToList();
+        //}
 
-        public List<Ingredient> GetIngredients()
-        {
-            return db.Ingredients.Include("Pizze").ToList();
-        }
+        //public List<Ingredient> GetIngredients()
+        //{
+        //    return db.Ingredients.Include("Pizze").ToList();
+        //}
 
         //public PizzaForm CreatePizzaForm()
         //{

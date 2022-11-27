@@ -32,7 +32,7 @@ namespace la_mia_pizzeria_static.Controllers
         // con la stessa aria di memoria posso avere 2 comportamenti diversi, uno sulla lista , uno sul db
         public PizzaController(IPizzeriaRepository _pizzeriaRepository) : base() 
         {
-            //db = new PizzeriaDbContext();
+            db = new PizzeriaDbContext();
 
             //dependency injection, il controller
             //viene inizializzato con repository adatto alla situazione
@@ -65,11 +65,11 @@ namespace la_mia_pizzeria_static.Controllers
             PizzaForm formData = new PizzaForm();
 
             formData.Pizza = new Pizza();
-            formData.Categories = pizzaRepository.GetCategories(); 
+            formData.Categories = db.Categories.ToList();
             formData.Ingredients = new List<SelectListItem>();  //ora gli ingredient sono una lista di SelectListItem
 
             //per popolarlo prendiamo una lista di ingredient e col forech la convertiamo
-            List<Ingredient> ingredientList = pizzaRepository.GetIngredients();
+            List<Ingredient> ingredientList = db.Ingredients.ToList();
 
             foreach (Ingredient ingredient in ingredientList)
             {
@@ -90,10 +90,10 @@ namespace la_mia_pizzeria_static.Controllers
             {
                 //return View(pizzaRepository.CreatePizzaForm());
 
-                formData.Categories = pizzaRepository.GetCategories();
+                formData.Categories = db.Categories.ToList();
                 formData.Ingredients = new List<SelectListItem>();
 
-                List<Ingredient> IngredientList = pizzaRepository.GetIngredients();
+                List<Ingredient> IngredientList = db.Ingredients.ToList();
 
                 foreach (Ingredient ingredient in IngredientList)
                 {
@@ -120,10 +120,10 @@ namespace la_mia_pizzeria_static.Controllers
             PizzaForm formData = new PizzaForm();
 
             formData.Pizza = pizza;
-            formData.Categories = pizzaRepository.GetCategories();
+            formData.Categories = db.Categories.ToList();
             formData.Ingredients = new List<SelectListItem>();
 
-            List<Ingredient> ingredientsList = pizzaRepository.GetIngredients();  //creiamo una lista che contiene tutti i tag
+            List<Ingredient> ingredientsList = db.Ingredients.ToList();  //creiamo una lista che contiene tutti i tag
             //nel foreach creiamo l'oggetto che contiene i nostri dati e  tutti gli ingredienti già selezionati  
             //(non abbiamo l'hold, quindi questo è un escamotage per recuperare gli ingredienti  già salvati
 
@@ -149,10 +149,10 @@ namespace la_mia_pizzeria_static.Controllers
             {
                 formData.Pizza.Id = id;
                 //return View(pizzaItem);
-                formData.Categories = pizzaRepository.GetCategories(); ;
+                formData.Categories = db.Categories.ToList();
                 formData.Ingredients = new List<SelectListItem>();
 
-                List<Ingredient> ingredientsList = pizzaRepository.GetIngredients();
+                List<Ingredient> ingredientsList = db.Ingredients.ToList();
 
                 foreach (Ingredient ingredient in ingredientsList)
                 {

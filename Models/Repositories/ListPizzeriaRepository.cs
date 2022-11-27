@@ -7,8 +7,8 @@ namespace la_mia_pizzeria_static.Models.Repositories
     {
         //se non abbiamo più il server lavoreremo su questa lista di post
         public static List<Pizza> Pizze = new List<Pizza>();
-        public static List<Category> Categories = new List<Category>();
-        public static List<Ingredient> Ingredients = new List<Ingredient>();
+        //public static List<Category> Categories = new List<Category>();
+        //public static List<Ingredient> Ingredients = new List<Ingredient>();
 
         public ListPizzeriaRepository()
         {
@@ -20,15 +20,15 @@ namespace la_mia_pizzeria_static.Models.Repositories
             return ListPizzeriaRepository.Pizze;
         }
 
-        public List<Category> GetCategories()
-        {
-            return Categories;
-        }
+        //public List<Category> GetCategories()
+        //{
+        //    return Categories;
+        //}
 
-        public List<Ingredient> GetIngredients()
-        {
-            return Ingredients;
-        }
+        //public List<Ingredient> GetIngredients()
+        //{
+        //    return Ingredients;
+        //}
 
         public void Create(Pizza pizza, List<int> selectedIngredients)
         {
