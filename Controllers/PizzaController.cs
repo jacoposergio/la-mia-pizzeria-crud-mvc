@@ -32,8 +32,10 @@ namespace la_mia_pizzeria_static.Controllers
         // con la stessa aria di memoria posso avere 2 comportamenti diversi, uno sulla lista , uno sul db
         public PizzaController(IPizzeriaRepository _pizzeriaRepository) : base() 
         {
-            db = new PizzeriaDbContext();
+            //db = new PizzeriaDbContext();
 
+            //dependency injection, il controller
+            //viene inizializzato con repository adatto alla situazione
             pizzaRepository = _pizzeriaRepository;
             pizzaRepository = new ListPizzeriaRepository();
         }
@@ -63,11 +65,11 @@ namespace la_mia_pizzeria_static.Controllers
             PizzaForm formData = new PizzaForm();
 
             formData.Pizza = new Pizza();
-            formData.Categories = db.Categories.ToList();
+            formData.Categories = pizzaRepository.GetCategories(); 
             formData.Ingredients = new List<SelectListItem>();  //ora gli ingredient sono una lista di SelectListItem
 
             //per popolarlo prendiamo una lista di ingredient e col forech la convertiamo
-            List<Ingredient> ingredientList = db.Ingredients.ToList();
+            List<Ingredient> ingredientList = pizzaRepository.GetIngredients();
 
             foreach (Ingredient ingredient in ingredientList)
             {
@@ -88,10 +90,10 @@ namespace la_mia_pizzeria_static.Controllers
             {
                 //return View(pizzaRepository.CreatePizzaForm());
 
-                formData.Categories = db.Categories.ToList();
+                formData.Categories = pizzaRepository.GetCategories();
                 formData.Ingredients = new List<SelectListItem>();
 
-                List<Ingredient> IngredientList = db.Ingredients.ToList();
+                List<Ingredient> IngredientList = pizzaRepository.GetIngredients();
 
                 foreach (Ingredient ingredient in IngredientList)
                 {
@@ -118,10 +120,10 @@ namespace la_mia_pizzeria_static.Controllers
             PizzaForm formData = new PizzaForm();
 
             formData.Pizza = pizza;
-            formData.Categories = db.Categories.ToList();
+            formData.Categories = pizzaRepository.GetCategories();
             formData.Ingredients = new List<SelectListItem>();
 
-            List<Ingredient> ingredientsList = db.Ingredients.ToList();  //creiamo una lista che contiene tutti i tag
+            List<Ingredient> ingredientsList = pizzaRepository.GetIngredients();  //creiamo una lista che contiene tutti i tag
             //nel foreach creiamo l'oggetto che contiene i nostri dati e  tutti gli ingredienti già selezionati  
             //(non abbiamo l'hold, quindi questo è un escamotage per recuperare gli ingredienti  già salvati
 
@@ -147,10 +149,10 @@ namespace la_mia_pizzeria_static.Controllers
             {
                 formData.Pizza.Id = id;
                 //return View(pizzaItem);
-                formData.Categories = db.Categories.ToList();
+                formData.Categories = pizzaRepository.GetCategories(); ;
                 formData.Ingredients = new List<SelectListItem>();
 
-                List<Ingredient> ingredientsList = db.Ingredients.ToList();
+                List<Ingredient> ingredientsList = pizzaRepository.GetIngredients();
 
                 foreach (Ingredient ingredient in ingredientsList)
                 {
@@ -164,12 +166,14 @@ namespace la_mia_pizzeria_static.Controllers
             //update esplicito con nuovo oggetto: recuperiamo la pizza dal db
             Pizza pizzaItem = pizzaRepository.GetById(id);
 
+            // questa è solo la logica del controller, 
+            //l'altra è del db
             if (pizzaItem == null)
             {
                 return NotFound();
             }
 
-            //ora tutti gli elementi sono tracked, cioè stiamo lavorando sul db
+          //cerchiamo di passare solo i dati necessari
             pizzaRepository.Update(pizzaItem, formData.Pizza, formData.SelectedIngredients);
 
            
@@ -183,6 +187,7 @@ namespace la_mia_pizzeria_static.Controllers
         {
             Pizza pizza = pizzaRepository.GetById(id);
 
+       
             if (pizza == null)
             {
                 return NotFound();

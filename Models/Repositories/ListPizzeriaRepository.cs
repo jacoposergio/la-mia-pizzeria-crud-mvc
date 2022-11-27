@@ -7,6 +7,8 @@ namespace la_mia_pizzeria_static.Models.Repositories
     {
         //se non abbiamo più il server lavoreremo su questa lista di post
         public static List<Pizza> Pizze = new List<Pizza>();
+        public static List<Category> Categories = new List<Category>();
+        public static List<Ingredient> Ingredients = new List<Ingredient>();
 
         public ListPizzeriaRepository()
         {
@@ -18,17 +20,32 @@ namespace la_mia_pizzeria_static.Models.Repositories
             return ListPizzeriaRepository.Pizze;
         }
 
-        public void Create(Pizza pizza, List<int> SelectedIngredients)
+        public List<Category> GetCategories()
+        {
+            return Categories;
+        }
+
+        public List<Ingredient> GetIngredients()
+        {
+            return Ingredients;
+        }
+
+        public void Create(Pizza pizza, List<int> selectedIngredients)
         {
             pizza.Id = Pizze.Count;  //simula il pk
             pizza.Category = new Category() { Id = 1, Title = "Fake Category" };
             //non potendo avere il db e nn potendo avere l'ingredients list
-            pizza.Ingredients = new List<Ingredient> (); 
-           foreach(int IngredientId in SelectedIngredients)
+            pizza.Ingredients = new List<Ingredient>();
+            IngredientToPizza(pizza, selectedIngredients);
+            Pizze.Add(pizza);
+        }
+
+        private static void IngredientToPizza(Pizza pizza, List<int> selectedIngredients)
+        {
+            foreach (int IngredientId in selectedIngredients)
             {
-                pizza.Ingredients.Add(new Ingredient() { Id = IngredientId , Title = "Fake ingredient" + IngredientId }); 
+                pizza.Ingredients.Add(new Ingredient() { Id = IngredientId, Title = "Fake ingredient" + IngredientId });
             }
-           Pizze.Add(pizza);
         }
 
         public Pizza GetById(int id)
@@ -38,16 +55,13 @@ namespace la_mia_pizzeria_static.Models.Repositories
             return pizza;
         }
 
-        public void Update(Pizza pizza, Pizza formData, List<int>? SelectedIngredients)
+        public void Update(Pizza pizza, Pizza formData, List<int>? selectedIngredients)
         {
             pizza = formData;
             pizza.Category = new Category() { Id = 1, Title = "Fake Category" };
             pizza.Ingredients = new List<Ingredient>();
             //simulazione da implementare con listtagrepository
-            foreach(int IngredientId in SelectedIngredients)
-            {
-                pizza.Ingredients.Add(new Ingredient() { Id = IngredientId, Title = "Fake ingredient" + IngredientId });
-            }
+            IngredientToPizza(pizza, selectedIngredients);
         }
 
         public void Delete(Pizza pizza)
